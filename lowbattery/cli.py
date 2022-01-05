@@ -1,7 +1,9 @@
 #!/usr/bin/env python3
 
+import argparse
 import re
 import subprocess
+import sys
 import time
 
 def parse_upower(s):
@@ -63,15 +65,17 @@ def main_loop(config):
             notify(notification)
         time.sleep(10)
 
-# TODO: argparse
 def main():
-    # return poll_upower_info()
-    config = {'warn_battery_level': 98,
-              'critical_battery_level': 96}
-    main_loop(config)
+    parser = argparse.ArgumentParser(description='A tool that notifies when the laptop battery runs low.')
+    parser.add_argument('--warn', metavar='PERCENTAGE', type=int, help='notify with critical warning below this battery level. (default: 15)', default=15)
+    parser.add_argument('--critical', metavar='PERCENTAGE', type=int, help='notify with warning below this battery level. (default: 5)', default=5)
+    args = parser.parse_args(sys.argv[1:])
 
-    # with open('./data/discharging.txt', 'r') as f:
-    #     print(parse_upower(f.read()))
+    config = {
+      'warn_battery_level': args.warn,
+      'critical_battery_level': args.critical
+    }
+    main_loop(config)
 
 if __name__ == '__main__':
     main()
