@@ -28,9 +28,9 @@ def compute_notify(warning_state, battery_level, tto):
     urgency = 'normal'
     if warning_state == 'critical':
         urgency = 'critical'
-        summary = f'Battery is critically low. Battery is at {battery_level}%.'
+        summary = f'Battery is critically low ({battery_level}%).'
     else:
-        summary = f'Battery is low. Battery is at {battery_level}%.'
+        summary = f'Battery is low ({battery_level}%).'
     if tto is not None:
         summary += f' You have approximately {tto}, before the battery runs out of power.'
 
@@ -65,16 +65,33 @@ def main_loop(config):
             notify(notification)
         time.sleep(10)
 
+def command_exists(name):
+    rp = subprocess.run(f'command -v {name} > /dev/null', shell=True)
+    return rp.returncode == 0
+
+def check_dependencies(cmds=['notify-send', 'upower']):
+    d = {}
+    all_exists = True
+    for cmd in cmds:
+        d[cmd] = command_exists(cmd)
+        all_exists = all_exists and d[cmd]
+    if not all_exists:
+        print('The following commands are not available, but are required by lowbattery. Please install them.')
+        for (command, exists) in d.items():
+            if not exists:
+                print(f'- "{command}"')
+        sys.exit(1)
+
 def main():
     parser = argparse.ArgumentParser(description='A tool that notifies when the laptop battery runs low.')
     parser.add_argument('--warn', metavar='PERCENTAGE', type=int, help='notify with critical warning below this battery level. (default: 15)', default=15)
     parser.add_argument('--critical', metavar='PERCENTAGE', type=int, help='notify with warning below this battery level. (default: 5)', default=5)
     args = parser.parse_args(sys.argv[1:])
-
     config = {
       'warn_battery_level': args.warn,
       'critical_battery_level': args.critical
     }
+    check_dependencies()
     main_loop(config)
 
 if __name__ == '__main__':
