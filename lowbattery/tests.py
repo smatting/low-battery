@@ -19,7 +19,7 @@ class Tests(unittest.TestCase):
         assert state['warning_state'] == 'warn'
         assert notification is not None
         assert notification['urgency'] == 'normal'
-        assert 'is low' in notification['summary']
+        assert 'is low' in notification['body']
 
         # dont warn on next poll
         state, notification = lowbattery.cli.update(default_config, state, {'tto': None, 'battery_level': 15, 'charging': 'discharging'})
@@ -30,7 +30,7 @@ class Tests(unittest.TestCase):
         state, notification = lowbattery.cli.update(default_config, state, {'tto': None, 'battery_level': 5, 'charging': 'discharging'})
         assert notification is not None
         assert notification['urgency'] == 'critical'
-        assert 'is critically low' in notification['summary']
+        assert 'is critically low' in notification['body']
 
         # charger plugged in -> everything resets
         state, notification = lowbattery.cli.update(default_config, state, {'tto': None, 'battery_level': 5, 'charging': 'charging'})
@@ -41,7 +41,7 @@ class Tests(unittest.TestCase):
         state, notification = lowbattery.cli.update(default_config, state, {'tto': None, 'battery_level': 5, 'charging': 'discharging'})
         assert notification is not None
         assert notification['urgency'] == 'critical'
-        assert 'is critically low' in notification['summary']
+        assert 'is critically low' in notification['body']
 
 if __name__ == '__main__':
     unittest.main()

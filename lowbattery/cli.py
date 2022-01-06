@@ -28,17 +28,17 @@ def compute_notify(warning_state, battery_level, tto):
     urgency = 'normal'
     if warning_state == 'critical':
         urgency = 'critical'
-        summary = f'Battery is critically low ({battery_level}%).'
+        body = f'Battery is critically low ({battery_level}%).'
     else:
-        summary = f'Battery is low ({battery_level}%).'
+        body = f'Battery is low ({battery_level}%).'
     if tto is not None:
-        summary += f' You have approximately {tto}, before the battery runs out of power.'
+        body += f' You have approximately {tto}, before the battery runs out of power.'
 
-    notification = {'urgency': urgency, 'summary': summary}
+    notification = {'urgency': urgency, 'body': body}
     return notification
 
 def notify(notification):
-    subprocess.run(f'notify-send --urgency={notification["urgency"]} "{notification["summary"]}"', shell=True)
+    subprocess.run(f'notify-send --urgency={notification["urgency"]} "Battery warning" "{notification["body"]}"', shell=True)
 
 def update(config, last_state, upower_info):
     warning_state = None
